@@ -1,0 +1,5 @@
+I wrote this code to run an automated email and calendar invite system to make an efficient meet and greet process - connecting around ~100 incoming freshers to ~30 greeting volunteers, and making sure everyone gets picked up. 
+  
+This script runs off a GoogleSheets spreadsheet with atleast two columns - named 'ALL ARRIVALS' and 'TemplateEmails'. On assignment, it sends an email to the fresher and volunteer, describing the time and date of pick-up. It also sends a calendar invite to the volunteer. It later gives a confirmatory invite 24 hours before to the volunteer, and if it is not accepted in a few hours, flags the event for follow up by a coordinator. The script also saves logs, and sends out emails to a coordinator if there is an unassigned fresher, in a separate sheet called 'TechnicalStuff'. 
+  
+  An automatic trigger runs the script every 4 hours, and it can also be run manually by calling 'SweepSpreadsheet'. The columns and rows need to be set up appropriately, as can be seen from reading the script functions.

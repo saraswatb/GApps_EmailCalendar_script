@@ -1,0 +1,494 @@
+/** Script to automate the whole meet and greet process using automated emails and calendar invites
+* Written by Saraswat Bhattacharyya (India & St. Johns/Lincoln, 2019)
+*/
+
+function sendIntroEmail(ss, currIndex) {  
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');
+
+  var vol_name = sheet1.getRange(currIndex,12).getValue();
+  var vol_id   = sheet1.getRange(currIndex,13).getValue();
+  var vol_num  = sheet1.getRange(currIndex,14).getValue();
+
+  var arrival_name = sheet1.getRange(currIndex,1).getValue();
+  var arrival_ID   = sheet1.getRange(currIndex,5).getValue();
+  var arrival_num  = sheet1.getRange(currIndex,4).getValue();
+
+  var fl_date_time       = sheet1.getRange(currIndex,20).getValue();
+
+  var mode_transport= sheet1.getRange(currIndex,9).getValue();
+  var pick_up       = sheet1.getRange(currIndex,10).getValue();
+  var coll_name     = sheet1.getRange(currIndex,3).getValue();
+  var accom         = sheet1.getRange(currIndex,11).getValue();
+  
+  var vol_coord      = sheet1.getRange(currIndex,19).getValue();
+  var vol_coord_email= sheet1.getRange(currIndex,17).getValue();
+  var vol_coord_phone= sheet1.getRange(currIndex,18).getValue();
+
+  var templates = ss.getSheetByName('TemplateEmails')  
+  var subject = templates.getRange(1,2).getValue();
+
+  //
+
+  var message = templates.getRange(1,3).getValue();
+  
+  
+  message = message.replace("<vol_name>", vol_name).replace("<vol_id>", vol_id).replace("<vol_num>", vol_num);
+  message = message.replace("<fl_date_time>", fl_date_time).replace("<arrival_name>", arrival_name).replace("<arrival_ID>", arrival_ID).replace("<arrival_num>", arrival_num);
+  message = message.replace("<mode_transport>", mode_transport);
+  message = message.replace("<pick_up>", pick_up).replace("<coll_name>", coll_name).replace("<accom>", accom);
+  message = message.replace("<vol_coord>", vol_coord).replace("<vol_coord_email>", vol_coord_email).replace("<vol_coord_phone>", vol_coord_phone);
+  
+  
+  try {
+    GmailApp.sendEmail(arrival_ID, subject, message, {cc: vol_id});
+    Logger.log('Intro Email sent, index : ' + currIndex);
+    sheet1.getRange(currIndex,15).setValue(1);        //mail flag
+
+  } catch (err) {
+    Logger.log('Failed with error %d: %s \n', currIndex, err.message);
+  }
+}
+
+function changeVolunteerEmail(ss, currIndex) {  
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');
+
+  var vol_name = sheet1.getRange(currIndex,12).getValue();
+  var vol_id   = sheet1.getRange(currIndex,13).getValue();
+  var vol_num  = sheet1.getRange(currIndex,14).getValue();
+
+  var arrival_name = sheet1.getRange(currIndex,1).getValue();
+  var arrival_ID   = sheet1.getRange(currIndex,5).getValue();
+  var arrival_num  = sheet1.getRange(currIndex,4).getValue();
+
+  var fl_date_time       = sheet1.getRange(currIndex,20).getValue();
+
+  var mode_transport= sheet1.getRange(currIndex,9).getValue();
+  var pick_up       = sheet1.getRange(currIndex,10).getValue();
+  var coll_name     = sheet1.getRange(currIndex,3).getValue();
+  var accom         = sheet1.getRange(currIndex,11).getValue();
+  
+  var vol_coord      = sheet1.getRange(currIndex,19).getValue();
+  var vol_coord_email= sheet1.getRange(currIndex,17).getValue();
+  var vol_coord_phone= sheet1.getRange(currIndex,18).getValue();
+
+  var templates = ss.getSheetByName('TemplateEmails')  
+  var subject = templates.getRange(3,2).getValue();
+
+  //
+
+  var message = templates.getRange(3,3).getValue();
+  
+  
+  message = message.replace("<vol_name>", vol_name).replace("<vol_id>", vol_id).replace("<vol_num>", vol_num);
+  message = message.replace("<fl_date_time>", fl_date_time).replace("<arrival_name>", arrival_name).replace("<arrival_ID>", arrival_ID).replace("<arrival_num>", arrival_num);
+  message = message.replace("<mode_transport>", mode_transport);
+  message = message.replace("<pick_up>", pick_up).replace("<coll_name>", coll_name).replace("<accom>", accom);
+  message = message.replace("<vol_coord>", vol_coord).replace("<vol_coord_email>", vol_coord_email).replace("<vol_coord_phone>", vol_coord_phone);
+  
+  try {
+    GmailApp.sendEmail(arrival_ID, subject, message, {cc: vol_id});
+    Logger.log('Volunteer Change Email sent, index : ' + currIndex);
+    sheet1.getRange(currIndex,15).setValue(1);        //mail flag
+  } catch (err) {
+    Logger.log('Failed with error %d: %s \n', currIndex, err.message);
+  }
+}
+
+function sendIntroCalInvite(ss, currIndex) {  
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');  
+  var vol_id   = sheet1.getRange(currIndex,13).getValue();
+
+  var arrival_name = sheet1.getRange(currIndex,1).getValue();
+  var arrival_ID   = sheet1.getRange(currIndex,5).getValue();
+  var arrival_num  = sheet1.getRange(currIndex,4).getValue();
+
+  var fl_date_time       = sheet1.getRange(currIndex,20).getValue();
+  var mode_transport= sheet1.getRange(currIndex,9).getValue();
+  var pick_up       = sheet1.getRange(currIndex,10).getValue();
+  var coll_name     = sheet1.getRange(currIndex,3).getValue();
+  var accom         = sheet1.getRange(currIndex,11).getValue();  
+
+  var templates = ss.getSheetByName('TemplateEmails')  
+
+  var subject = templates.getRange(7,2).getValue();
+  subject = subject.replace("<arrival_name>", arrival_name);
+
+  var message = templates.getRange(7,3).getValue();
+  message = message.replace("<arrival_name>", arrival_name).replace("<arrival_ID>", arrival_ID).replace("<arrival_num>", arrival_num);
+  message = message.replace("<fl_date_time>", fl_date_time).replace("<mode_transport>", mode_transport);
+  message = message.replace("<pick_up>", pick_up).replace("<coll_name>", coll_name).replace("<accom>", accom);
+  
+  const calendarId = "hbjs7b0eoomjpub52jd5vvqrhc@group.calendar.google.com";
+  const start = getEventDate(fl_date_time, 2, 30);
+  const end   = getEventDate(fl_date_time, 3, 30); 
+  
+  // event details for creating event.
+  let event = {
+    summary: subject,
+    location: pick_up,
+    description: message,
+    sendUpdates:"all",
+    start: {
+      dateTime: start.toISOString()
+    },
+    end: {
+      dateTime: end.toISOString()
+    },
+    attendees: [
+      {email: vol_id}
+    ],
+    
+    
+    
+  };
+  try {
+    // call method to insert/create new event in provided calandar
+    event = Calendar.Events.insert(event, calendarId, {'sendUpdates':"all"});
+    Logger.log('Event ID: ' + event.id);
+  } catch (err) {
+    Logger.log('Failed with error %d: %s \n', currIndex, err.message);
+  }
+  
+}
+
+function sendConfirmCalInvite(ss, currIndex) {
+  
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');  
+  var vol_id   = sheet1.getRange(currIndex,13).getValue();
+
+  var arrival_name = sheet1.getRange(currIndex,1).getValue();
+  var arrival_ID   = sheet1.getRange(currIndex,5).getValue();
+  var arrival_num  = sheet1.getRange(currIndex,4).getValue();
+
+  var fl_date_time       = sheet1.getRange(currIndex,20).getValue();
+  var mode_transport= sheet1.getRange(currIndex,9).getValue();
+  var pick_up       = sheet1.getRange(currIndex,10).getValue();
+  var coll_name     = sheet1.getRange(currIndex,3).getValue();
+  var accom         = sheet1.getRange(currIndex,11).getValue();  
+
+  var vol_coord      = sheet1.getRange(currIndex,19).getValue();
+  var vol_coord_email= sheet1.getRange(currIndex,17).getValue();
+  var vol_coord_phone= sheet1.getRange(currIndex,18).getValue();
+
+  var templates = ss.getSheetByName('TemplateEmails')  
+
+  var subject = templates.getRange(5,2).getValue();
+  subject = subject.replace("<arrival_name>", arrival_name);
+
+  var message = templates.getRange(5,3).getValue();
+  message = message.replace("<arrival_name>", arrival_name).replace("<arrival_ID>", arrival_ID).replace("<arrival_num>", arrival_num);
+  message = message.replace("<fl_date_time>", fl_date_time).replace("<mode_transport>", mode_transport);
+  message = message.replace("<pick_up>", pick_up).replace("<coll_name>", coll_name).replace("<accom>", accom);
+
+  message = message.replace("<vol_coord>", vol_coord).replace("<vol_coord_email>", vol_coord_email).replace("<vol_coord_phone>", vol_coord_phone);
+  
+  const calendarId = "hbjs7b0eoomjpub52jd5vvqrhc@group.calendar.google.com";
+  const start = getEventDate(fl_date_time, 1, 45);
+  const end   = getEventDate(fl_date_time, 3, 0); 
+  
+  // event details for creating event.
+  let event = {
+    summary: subject,
+    location: pick_up,
+    description: message,
+    sendUpdates:"all",
+    start: {
+      dateTime: start.toISOString()
+    },
+    end: {
+      dateTime: end.toISOString()
+    },
+    attendees: [
+      {email: vol_id},
+      //{email: vol_coord_email}
+    ],   
+    reminders: {
+        useDefault: false,  
+        overrides: [
+            {
+              method: "popup",
+              minutes: 30
+            },   
+          ]
+    }
+    
+  };
+  try {
+    // call method to insert/create new event in provided calandar
+    event = Calendar.Events.insert(event, calendarId, {
+      'sendUpdates':"all",      
+    });
+    Logger.log('Event ID: ' + event.id);
+
+    sheet1.getRange(currIndex,21).setValue(event.id); //cal ID
+    sheet1.getRange(currIndex,16).setValue(1);        //cal flag
+
+  } catch (err) {
+    Logger.log('Failed with error %d: %s \n', currIdx, err.message);
+  }
+
+  
+  
+}
+
+function checkConfirmation(ss, currIndex){
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');
+
+  const calendarId = "hbjs7b0eoomjpub52jd5vvqrhc@group.calendar.google.com";
+  const eventId = sheet1.getRange(currIndex,21).getValue();
+  var confirm_status = Calendar.Events.get(calendarId, eventId).attendees[0].responseStatus;
+  var calEvent =  Calendar.Events.get(calendarId, eventId);
+  if (confirm_status == "accepted"){ //does not work for non-Google calendars
+    sheet1.getRange(currIndex,16).setValue(2);        //cal flag - no action
+  }
+  else{    
+    sendNoConfirmEmail(ss, currIndex);
+    sheet1.getRange(currIndex,16).setValue(3);        //cal flag - forward to coordinator
+  }
+  
+}
+
+function sendNoConfirmEmail(ss, currIndex) {  
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');
+
+  var vol_name = sheet1.getRange(currIndex,12).getValue();
+  var vol_id   = sheet1.getRange(currIndex,13).getValue();
+  var vol_num  = sheet1.getRange(currIndex,14).getValue();
+
+  var arrival_name = sheet1.getRange(currIndex,1).getValue();
+  var arrival_ID   = sheet1.getRange(currIndex,5).getValue();
+  var arrival_num  = sheet1.getRange(currIndex,4).getValue();
+
+  var fl_date_time       = sheet1.getRange(currIndex,20).getValue();
+
+  var mode_transport= sheet1.getRange(currIndex,9).getValue();
+  var pick_up       = sheet1.getRange(currIndex,10).getValue();
+  var coll_name     = sheet1.getRange(currIndex,3).getValue();
+  var accom         = sheet1.getRange(currIndex,11).getValue();
+  
+  var vol_coord      = sheet1.getRange(currIndex,19).getValue();
+  var vol_coord_email= sheet1.getRange(currIndex,17).getValue();
+  var vol_coord_phone= sheet1.getRange(currIndex,18).getValue();
+
+  var templates = ss.getSheetByName('TemplateEmails')  
+  var subject = templates.getRange(9,2).getValue();
+
+  //
+
+  var message = templates.getRange(9,3).getValue();
+  
+  
+  message = message.replace("<vol_name>", vol_name).replace("<vol_id>", vol_id).replace("<vol_num>", vol_num);
+  message = message.replace("<fl_date_time>", fl_date_time).replace("<arrival_name>", arrival_name).replace("<arrival_ID>", arrival_ID).replace("<arrival_num>", arrival_num);
+  message = message.replace("<mode_transport>", mode_transport);
+  message = message.replace("<pick_up>", pick_up).replace("<coll_name>", coll_name).replace("<accom>", accom);
+  message = message.replace("<vol_coord>", vol_coord).replace("<vol_coord_email>", vol_coord_email).replace("<vol_coord_phone>", vol_coord_phone);
+  
+  
+  try {
+    GmailApp.sendEmail(vol_coord_email, subject, message);
+    Logger.log('No-confirm Email sent, index : ' + currIndex);
+
+  } catch (err) {
+    Logger.log('Failed with error %d: %s \n', currIdx, err.message);
+  }
+}
+
+function processCurrentElement(ss, currIndex){
+  
+  
+  if (timeToEvent(ss, currIndex) < 0){
+    //past event, ignore
+    return;
+  }
+  var sheet1=ss.getSheetByName('ALL ARRIVALS');  
+
+  var vol_name = sheet1.getRange(currIndex,12).getValue();
+  if (vol_name.trim() === "Not Allocated".trim()){
+    //unallocated, return
+    if (timeToEvent(ss, currIndex) < 23){
+      sendNoConfirmEmail(ss, currIndex);
+    }
+    return;
+  }
+  else if (vol_name.trim() === "Big Group".trim()){
+    //return - big groups managed separately
+    return;
+  }
+
+  intro_email_flag = sheet1.getRange(currIndex,15).getValue();
+  //Logger.log('Intro email flag %d \n', intro_email_flag);
+  if (intro_email_flag == 0){
+    sendIntroEmail(ss, currIndex);
+    sendIntroCalInvite(ss, currIndex)
+  }
+  else if (intro_email_flag == 2){
+    changeVolunteerEmail(ss, currIndex);
+    sendIntroCalInvite(ss, currIndex)
+  }
+
+  if (timeToEvent(ss, currIndex) < 23){
+    //time to send some confirmation invites
+    confirm_flag = sheet1.getRange(currIndex,16).getValue();
+
+    if (confirm_flag == 0){
+      sendConfirmCalInvite(ss, currIndex);
+    }
+    else if (confirm_flag == 1){
+      if (timeToEvent(ss, currIndex) < 16){
+        //time to hit the panic button
+        checkConfirmation(ss, currIndex);
+      }
+    }
+    //cases 2 or 3 have been dealt with, nothing to do here   
+    
+  }
+
+}
+
+function sweepSpreadsheet(){
+  
+  const currentDate = new Date();
+
+  //
+  if ((currentDate.getHours() >= 23) || (currentDate.getHours() <= 7)){
+    //if it's an ungodly hour (11pm - 7am), pass
+    return;
+  }
+  //
+
+  //open spreadsheet then
+  var ss = SpreadsheetApp.openById("*****************************");
+  SpreadsheetApp.setActiveSpreadsheet(ss);
+  ss.setSpreadsheetTimeZone("Europe/London")
+
+  if ((currentDate.getDate() >= 9) && (currentDate.getMonth() >= 10)){
+    //delete trigger after 9th of October
+    deleteTrigger();
+    Logger.log('Trigger deleted.')
+    
+  }
+
+  /*
+  var ss = SpreadsheetApp.getActiveSpreadsheet(); 
+  Logger.log('ID = %s \n', ss.getId());
+  return;
+  */
+  
+  //
+  for (let i = 2; i<=106; i++){
+    try{
+      processCurrentElement(ss, i);
+    } catch (err) {
+      Logger.log('Failed with error %d: %s \n', i, err.message);
+    }
+  }
+  //
+
+  /* testing
+  processCurrentElement(ss, 111);
+  */
+  
+  //save log to sheet
+  var logdump = ss.getSheetByName('TechnicalStuff')
+  var rowNum  = logdump.getRange(13,4).getValue();
+  var body    = Logger.getLog();
+  logdump.getRange(rowNum, 1).setValue(currentDate);
+  logdump.getRange(rowNum, 2).setValue(body);
+  logdump.getRange(13,4).setValue(rowNum+1);
+
+}
+
+/** Helper function to fix date for calendar events */
+function getEventDate(fl_date_time, hrsOffset, minsOffset) {
+  const date = new Date(fl_date_time);  
+  date.setHours(fl_date_time.getHours() + hrsOffset);
+  date.setMinutes(fl_date_time.getMinutes() + minsOffset);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
+}
+
+/** Helper functions to find time differences */
+function getTimeDifferenceHrs(fl_date_time) {
+  const dueDate = new Date(fl_date_time);
+  const currentDate = new Date();
+  var hr_diff = (dueDate.getTime() - currentDate.getTime())/(1000.0*60*60);
+  return hr_diff;
+}
+function timeToEvent(ss, currIndex) {
+  var sheet1        =ss.getSheetByName('ALL ARRIVALS'); 
+  var fl_date_time  = sheet1.getRange(currIndex,20).getValue();
+  return getTimeDifferenceHrs(fl_date_time);
+}
+
+
+/** Debugging functions */
+function runTests() {  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.setSpreadsheetTimeZone("Europe/London")
+  
+  // test case
+  currIndex = 111;
+
+  //sendIntroEmail(ss, currIndex);
+
+  //send test calendar invite
+  //sendIntroCalInvite(ss, currIndex);
+  sendConfirmCalInvite(ss, currIndex)
+
+  checkConfirmation(ss, currIndex);
+  //timeToEvent(ss, currIndex);
+
+  //processCurrentElement(ss, currIndex);
+
+  Logger.log(Session.getScriptTimeZone()); 
+  Logger.log(SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone());
+
+}
+
+
+// -----------------------------------------------------------------------------
+// Auto Trigger system
+// Ben Collins 2016
+// -----------------------------------------------------------------------------
+
+// add menu
+function onOpen() { 
+  var ui = SpreadsheetApp.getUi();
+  
+  ui.createMenu("Script Triggers")
+    .addItem("Start Automatic timer","runAuto")
+    .addItem("Process spreadsheet once","sweepSpreadsheet")
+    .addToUi();
+}
+
+// main function to control workflow - runs once
+function runAuto() { 
+  
+  // create trigger to run program automatically
+  createTrigger();
+}
+
+// create trigger to run every 4 hours
+function createTrigger() {
+  
+  ScriptApp.newTrigger('sweepSpreadsheet')
+      .timeBased()
+      .everyHours(4)
+      .create();
+
+  Logger.log('Trigger created. ')
+}
+
+// function to delete triggers
+function deleteTrigger() {
+  
+  // Loop over all triggers and delete them
+  var allTriggers = ScriptApp.getProjectTriggers();
+  
+  for (var i = 0; i < allTriggers.length; i++) {
+    ScriptApp.deleteTrigger(allTriggers[i]);
+  }
+  
+}
